@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>TIC-TAC-TOE</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js"></script>
+  </head>
+
+  <body>
+    <div id="div-main" class="container">
+      <div id="div-left" class="float-left">
+        <button id="reset-competition" class="button">Reset Competition</button>
+        <button id="reset-board" class="button">Reset Board</button>
+      </div>
+      <div id="div-middle" class="float-middle">
+        <div id="board" class="">
+          <!-- <div id="square-1-1" class="board-square"></div> -->
+          <!-- board squares will be added on load -->
+          <!-- origin is bottom left, 0 based -->
+        </div>
+        <p id="result"></p>
+      </div>
+      <div id="div-right" class="float-right">
+        <h1>Scores</h1>
+        <label
+          >X :
+          <input id="score-red" type="number" value="0" disabled />
+        </label>
+        <p></p>
+        <label
+          >O :
+          <input id="score-black" type="number" value="0" disabled />
+        </label>
+      </div>
+    </div>
+
+    <script>
+      function drawBoard(board, rows, cols) {
+        for (let x = 0; x < cols; x++) {
+          for (let y = rows - 1; y >= 0; y--) {
+            let square = document.createElement("div");
+            square.id = `square-${x}-${y}`;
+            square.classList.add(["board-square"]);
+            board.appendChild(square);
+          }
+        }
+      }
+
+      window.onload = function () {
+        let rows = 6;
+        let cols = 7;
+        let board = document.getElementById("board");
+        //create board
+        drawBoard(board,rows,cols);
+        //initialise storage
+        board.dataset.boardStorage = new BoardStorage(rows,cols);
+      };
+
+      document.getElementById("board").addEventListener(
+        "click",
+        (event) => {
+          if (event.target.classList.contains("board-square")) {
+            playTurn(event);
+          }
+        },
+        true
+      );
+
+      document
+        .getElementById("reset-competition")
+        .addEventListener("click", resetCompetition);
+
+      document
+        .getElementById("reset-board")
+        .addEventListener("click", resetBoard);
+    </script>
+  </body>
+</html>
