@@ -18,6 +18,18 @@ div.float-right {
     /* background-color: brown; */
 }
 
+#drop-zone {
+    border: 3px solid;
+    display :grid;
+    align-content: center;
+    grid-template-rows: repeat(1,50px);
+    grid-template-columns: repeat(7,100px);
+}
+
+.drop-button {
+    align-content: center;
+}
+
 #board {
     /* background-color: brown; */
     border: 3px solid;
@@ -37,19 +49,19 @@ div.float-right {
     font-size: 4rem;
 }
 
-.game-piece-x {
+.game-piece-red {
     color: red;
 }
 
-.game-piece-o {
-    color: blue;
+.game-piece-black {
+    color: black;
 }
 
 .winner {
     background-color: darkorange;
 }
 
-.button {
+.game-button {
     width: 200px;
     height: 100px;
     background-color: blue;

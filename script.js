@@ -1,43 +1,135 @@
-const Piece = Object.freeze({ 
-    Red:"Red", 
-    Black: "Black"
+const Piece = Object.freeze({
+  Red: "Red",
+  Black: "Black",
 });
 
 class BoardStorage {
-    #rows = 0;
-    #cols=0;
-    #cells=[];
+  #rows = 0;
+  #cols = 0;
+  #cells = [];
 
-    constructor(rows,cols) {
-        this.#rows = rows;
-        this.#cols = cols;
-        this.clear();
+  constructor(rows, cols) {
+    this.#rows = rows;
+    this.#cols = cols;
+    this.clear();
+  }
+
+  //drop a piece into a column
+  //return y position of piece (0 based)
+  dropPiece(col, piece) {
+    if (col < 0 || col > this.#cols - 1) {
+      throw new RangeError(`Column '${col}' out of bounds`);
     }
 
-    //drop a piece into a column
-    //return y position of piece (0 based)
-    dropPiece(col, piece) {
-        if (col < 0 || col > this.#cols - 1) {
-            throw new RangeError(`Column '${col}' out of bounds`);
-        }
-        
-        let column = this.#cells[col];
-        if (column.length >= this.#rows ) {
-            throw new RangeError(`Column '${col}' is full`);
-        }
-        
-        return column.push(piece) - 1;
+    let column = this.#cells[col];
+    if (column.length >= this.#rows) {
+      throw new RangeError(`Column '${col}' is full`);
     }
 
-    //return the element contained in cell row,col
-    peek(row, col)  {
-        return this.#cells[row, col];
-    }
+    return column.push(piece) - 1;
+  }
 
-    //reset the board to an empty state
-    clear() {
-        for (let x = 0; x < this.#cols; x++) {
-            this.#cells[x,0] = [];  
-         }
+  //return the element contained in cell row,col
+  peek(row, col) {
+    return this.#cells[row][col];
+  }
+
+  //reset the board to an empty state
+  clear() {
+    for (let x = 0; x < this.#cols; x++) {
+      this.#cells[x] = [];
     }
+  }
 }
+
+function drawWinner(winningArray) {
+  winningArray.forEach((element) => {
+    document
+      .getElementById(`square-${element.x}-${element.y}`)
+      .classList.add("winner");
+  });
+}
+
+//check for for pieces in a row
+//Algorithm is to, in turn, check from the given piece location in the positive direction and the negative direction
+//Stop checking in a given direction when no match
+//add results of negative and positive directions with the current position and if >= 4 we have a winner
+function checkForWinner(boardStorage, x, y) {
+  let deltaArray = [
+    { deltaX: 1, deltaY: 0 },
+    { deltaX: 0, deltaY: 1 },
+    { deltaX: 1, deltaY: 1 },
+    { deltaX: 1, deltaY: -1 }
+  ];
+  let winningArray;
+  //function to check for a winner in a particular direction i.e. vertical/horizontal/forwardDiagonal/backwardsDiagonal
+  //direction indicated by the deltaX and deltaY IN THE POSITIVE DIRECTION
+  //returns an array containing matching elements in a row
+  function checkDirection(boardStorage, x, y, deltaX, deltaY) {
+    let playerPiece = boardStorage.peek(x, y);
+
+    let ix;
+    let iy;
+    let winningArray = [{ x: x, y: y }];
+
+    let negCount = 0;
+    ix = x - deltaX;
+    iy = y - deltaY;
+    while (ix >= 0 && ix < G_cols && iy >= 0 && iy < G_rows) {
+      if (boardStorage.peek(ix, iy) == playerPiece) {
+        negCount++;
+        winningArray.unshift({ x: ix, y: iy });
+        ix = ix - deltaX;
+        iy = iy - deltaY;
+      } else {
+        ix = -1;
+      }
+    }
+
+    let posCount = 0;
+    ix = x + deltaX;
+    iy = y + deltaY;
+    while (ix >= 0 && ix < G_cols && iy >= 0 && iy < G_rows) {
+      if (boardStorage.peek(ix, iy) == playerPiece) {
+        posCount++;
+        winningArray.push({ x: ix, y: iy });
+        ix = ix + deltaX;
+        iy = iy + deltaY;
+      } else {
+        ix = -1;
+      }
+    }
+
+    return winningArray;
+  }
+
+  for (i in deltaArray) {
+    delta = deltaArray[i];
+    winningArray = checkDirection(boardStorage, x, y, delta.deltaX, delta.deltaY);
+    if (winningArray.length >= 4) {
+      break;
+    }
+  }
+
+  if (winningArray.length >= 4) {
+    drawWinner(winningArray);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function toggleTurn() {
+    let oldTurn = G_turn.toLowerCase();
+    //change turn piece
+    G_turn = (G_turn == Piece.Red) ? Piece.Black : Piece.Red;
+    let newTurn = G_turn.toLowerCase();
+
+    //change drop indicators
+    let dropButtons = document.querySelectorAll(".drop-button");
+    dropButtons.forEach(btn => {
+        btn.classList.remove(`game-piece-${oldTurn}`);
+        btn.classList.add(`game-piece-${newTurn}`);
+    })
+}
+

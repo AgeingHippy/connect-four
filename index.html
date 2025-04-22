@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>TIC-TAC-TOE</title>
+    <title>CONNECT FOUR</title>
     <link rel="stylesheet" href="style.css" />
     <script src="script.js"></script>
   </head>
@@ -9,10 +9,15 @@
   <body>
     <div id="div-main" class="container">
       <div id="div-left" class="float-left">
-        <button id="reset-competition" class="button">Reset Competition</button>
-        <button id="reset-board" class="button">Reset Board</button>
+        <button id="reset-competition" class="game-button">Reset Competition</button>
+        <button id="reset-board" class="game-button">Reset Board</button>
       </div>
       <div id="div-middle" class="float-middle">
+        <div id="drop-zone">
+          <!-- <div>
+            <button id="drop-button-0" class="drop-button game-piece-red">drop</button>
+          </div> -->
+        </div>
         <div id="board" class="">
           <!-- <div id="square-1-1" class="board-square"></div> -->
           <!-- board squares will be added on load -->
@@ -23,48 +28,97 @@
       <div id="div-right" class="float-right">
         <h1>Scores</h1>
         <label
-          >X :
+          >Red :
           <input id="score-red" type="number" value="0" disabled />
         </label>
         <p></p>
         <label
-          >O :
+          >Black :
           <input id="score-black" type="number" value="0" disabled />
         </label>
       </div>
     </div>
 
     <script>
+      let G_cols = 7;
+      let G_rows = 6;
+      let G_turn = Piece.Red;
+      let G_turnCount = 0;
+      let G_scoreRed = 0;
+      let G_scoreBlack = 0;
+      let G_boardStorage;
+
       function drawBoard(board, rows, cols) {
-        for (let x = 0; x < cols; x++) {
-          for (let y = rows - 1; y >= 0; y--) {
+        for (let y = rows - 1; y >=0 ; y--) {
+          for (let x= 0; x<cols; x++) {
             let square = document.createElement("div");
             square.id = `square-${x}-${y}`;
             square.classList.add(["board-square"]);
+            // square.innerText = `${x}-${y}`;
             board.appendChild(square);
           }
         }
       }
 
+      function drawDrop(dropZone, cols){
+        for (let y = 0; y < cols; y++) {
+          // <div>
+          //   <button id="drop-button-0" class="drop-button game-piece-red">drop</button>
+          // </div>
+          let div = document.createElement("div");
+          let dropButton = document.createElement("button");
+          dropButton.id = `drop-button-${y}`;
+          dropButton.classList.add("drop-button");
+          dropButton.innerText = "drop here";
+          div.appendChild(dropButton);
+          dropZone.appendChild(div);
+        }
+      }
+
       window.onload = function () {
-        let rows = 6;
-        let cols = 7;
         let board = document.getElementById("board");
+        let dropZone = document.getElementById("drop-zone");
         //create board
-        drawBoard(board,rows,cols);
+        drawBoard(board,G_rows,G_cols);
+        drawDrop(dropZone,G_cols);
+        toggleTurn();
+
         //initialise storage
-        board.dataset.boardStorage = new BoardStorage(rows,cols);
+        G_boardStorage = new BoardStorage(G_rows,G_cols)
       };
 
-      document.getElementById("board").addEventListener(
+      document.getElementById("drop-zone").addEventListener(
         "click",
         (event) => {
-          if (event.target.classList.contains("board-square")) {
-            playTurn(event);
+          if (event.target.classList.contains("drop-button")) {
+            let col = event.target.id.match(/drop-button-(\d+)/);
+            let x = parseInt(col[1]);
+            try {
+              let y = G_boardStorage.dropPiece(x,G_turn);
+              // let board = document.getElementById("board");
+              let square = document.getElementById(`square-${x}-${y}`);
+              square.classList.add(G_turn == Piece.Red ? "game-piece-red" : "game-piece-black");
+              square.innerText = "O";
+
+              if (y == G_rows-1) {
+                event.target.disabled = true;
+                event.target.innerText = "full";
+              }
+
+              if (checkForWinner(G_boardStorage,x,y)) {
+                document.getElementById("result").innerText = `${G_turn} wins!!!`;
+              }
+
+              toggleTurn();
+            }
+            catch (error) {
+              console.log(error.message);
+              event.target.disabled = true;
+            }
           }
         },
         true
-      );
+      )
 
       document
         .getElementById("reset-competition")
