@@ -9,7 +9,9 @@
   <body>
     <div id="div-main" class="container">
       <div id="div-left" class="float-left">
-        <button id="reset-competition" class="game-button">Reset Competition</button>
+        <button id="reset-competition" class="game-button">
+          Reset Competition
+        </button>
         <button id="reset-board" class="game-button">Reset Board</button>
       </div>
       <div id="div-middle" class="float-middle">
@@ -24,6 +26,7 @@
           <!-- origin is bottom left, 0 based -->
         </div>
         <p id="result"></p>
+        <p id="debug"></p>
       </div>
       <div id="div-right" class="float-right">
         <h1>Scores</h1>
@@ -36,6 +39,8 @@
           >Black :
           <input id="score-black" type="number" value="0" disabled />
         </label>
+        <br>
+        <div id="debug-log" class="fixed-scrollable"></div>
       </div>
     </div>
 
@@ -49,8 +54,9 @@
       let G_boardStorage;
 
       function drawBoard(board, rows, cols) {
-        for (let y = rows - 1; y >=0 ; y--) {
-          for (let x= 0; x<cols; x++) {
+        logDebug("drawBoard");
+        for (let y = rows - 1; y >= 0; y--) {
+          for (let x = 0; x < cols; x++) {
             let square = document.createElement("div");
             square.id = `square-${x}-${y}`;
             square.classList.add(["board-square"]);
@@ -60,7 +66,8 @@
         }
       }
 
-      function drawDrop(dropZone, cols){
+      function drawDrop(dropZone, cols) {
+        logDebug("drawDrop");
         for (let y = 0; y < cols; y++) {
           // <div>
           //   <button id="drop-button-0" class="drop-button game-piece-red">drop</button>
@@ -76,15 +83,15 @@
       }
 
       window.onload = function () {
+        logDebug("window.onload");
         let board = document.getElementById("board");
         let dropZone = document.getElementById("drop-zone");
         //create board
-        drawBoard(board,G_rows,G_cols);
-        drawDrop(dropZone,G_cols);
-        toggleTurn();
+        drawBoard(board, G_rows, G_cols);
+        drawDrop(dropZone, G_cols);
 
-        //initialise storage
-        G_boardStorage = new BoardStorage(G_rows,G_cols)
+        //Initialise new compettition
+        resetCompetition();
       };
 
       document.getElementById("drop-zone").addEventListener(
@@ -94,31 +101,37 @@
             let col = event.target.id.match(/drop-button-(\d+)/);
             let x = parseInt(col[1]);
             try {
-              let y = G_boardStorage.dropPiece(x,G_turn);
+              //todo - extract into playTurn method
+              let y = G_boardStorage.dropPiece(x, G_turn);
               // let board = document.getElementById("board");
               let square = document.getElementById(`square-${x}-${y}`);
-              square.classList.add(G_turn == Piece.Red ? "game-piece-red" : "game-piece-black");
+              square.classList.add(
+                G_turn == Piece.Red ? "game-piece-red" : "game-piece-black"
+              );
               square.innerText = "O";
 
-              if (y == G_rows-1) {
+              if (y == G_rows - 1) {
                 event.target.disabled = true;
                 event.target.innerText = "full";
               }
 
-              if (checkForWinner(G_boardStorage,x,y)) {
-                document.getElementById("result").innerText = `${G_turn} wins!!!`;
+              let winningArray = getWinnerArray(G_boardStorage, x, y);
+              if (winningArray) {
+                drawWinner(winningArray);
+                lockdownDrop();
+                G_turn == Piece.Red ? G_scoreRed++ : G_scoreBlack++;
+                updateScoreboard(`${G_turn} wins!!!`, G_scoreRed, G_scoreBlack);
+              } else {
+                toggleTurn();
               }
-
-              toggleTurn();
-            }
-            catch (error) {
+            } catch (error) {
               console.log(error.message);
               event.target.disabled = true;
             }
           }
         },
         true
-      )
+      );
 
       document
         .getElementById("reset-competition")

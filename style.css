@@ -75,3 +75,10 @@ div.float-right {
     font-size: xx-large;
     color:tomato;
 }
+
+.fixed-scrollable {
+    border: solid;
+    min-height: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+}

@@ -43,6 +43,7 @@ class BoardStorage {
 }
 
 function drawWinner(winningArray) {
+  logDebug("drawWinner");
   winningArray.forEach((element) => {
     document
       .getElementById(`square-${element.x}-${element.y}`)
@@ -54,12 +55,15 @@ function drawWinner(winningArray) {
 //Algorithm is to, in turn, check from the given piece location in the positive direction and the negative direction
 //Stop checking in a given direction when no match
 //add results of negative and positive directions with the current position and if >= 4 we have a winner
-function checkForWinner(boardStorage, x, y) {
+//If we have a winner, the array of locations is returned
+//else undefined is returned
+function getWinnerArray(boardStorage, x, y) {
+  logDebug("getWinnerArray");
   let deltaArray = [
     { deltaX: 1, deltaY: 0 },
     { deltaX: 0, deltaY: 1 },
     { deltaX: 1, deltaY: 1 },
-    { deltaX: 1, deltaY: -1 }
+    { deltaX: 1, deltaY: -1 },
   ];
   let winningArray;
   //function to check for a winner in a particular direction i.e. vertical/horizontal/forwardDiagonal/backwardsDiagonal
@@ -103,33 +107,94 @@ function checkForWinner(boardStorage, x, y) {
     return winningArray;
   }
 
+  //check all 4 directions
   for (i in deltaArray) {
     delta = deltaArray[i];
-    winningArray = checkDirection(boardStorage, x, y, delta.deltaX, delta.deltaY);
+    winningArray = checkDirection(
+      boardStorage,
+      x,
+      y,
+      delta.deltaX,
+      delta.deltaY
+    );
     if (winningArray.length >= 4) {
       break;
     }
   }
 
   if (winningArray.length >= 4) {
-    drawWinner(winningArray);
-    return true;
+    return winningArray;
   } else {
-    return false;
+    return undefined;
   }
 }
 
 function toggleTurn() {
-    let oldTurn = G_turn.toLowerCase();
-    //change turn piece
-    G_turn = (G_turn == Piece.Red) ? Piece.Black : Piece.Red;
-    let newTurn = G_turn.toLowerCase();
+  logDebug("toggleTurn");
+  let oldTurn = G_turn.toLowerCase();
+  //change turn piece
+  G_turn = G_turn == Piece.Red ? Piece.Black : Piece.Red;
+  let newTurn = G_turn.toLowerCase();
 
-    //change drop indicators
-    let dropButtons = document.querySelectorAll(".drop-button");
-    dropButtons.forEach(btn => {
-        btn.classList.remove(`game-piece-${oldTurn}`);
-        btn.classList.add(`game-piece-${newTurn}`);
-    })
+  //change drop indicators
+  let dropButtons = document.querySelectorAll(".drop-button");
+  dropButtons.forEach((btn) => {
+    btn.classList.remove(`game-piece-${oldTurn}`);
+    btn.classList.add(`game-piece-${newTurn}`);
+  });
 }
 
+function resetDrop() {
+  logDebug("resetDrop");
+  let dropButtons = document.querySelectorAll(".drop-button");
+  dropButtons.forEach((btn) => {
+    btn.disabled = false;
+    btn.innerText = "drop here";
+  });
+}
+
+function lockdownDrop() {
+  logDebug("lockdownDrop");
+  let dropButtons = document.querySelectorAll(".drop-button");
+  dropButtons.forEach((btn) => {
+    btn.disabled = true;
+  });
+}
+
+function resetBoard() {
+  logDebug("resetBoard");
+  G_boardStorage = new BoardStorage(G_rows, G_cols);
+  let boardSquares = document.querySelectorAll(".board-square");
+  boardSquares.forEach((square) => {
+    square.classList.remove("winner");
+    square.classList.remove("game-piece-red");
+    square.classList.remove("game-piece-black");
+    square.innerText = "";
+  });
+  resetDrop();
+  toggleTurn();
+}
+
+function resetCompetition() {
+  logDebug("resetCompetition");
+  //reset scores
+  G_turnCount = 0;
+  G_scoreRed = 0;
+  G_scoreBlack = 0;
+  //reset board
+  resetBoard();
+  updateScoreboard("", 0, 0);
+}
+
+function updateScoreboard(result, scoreRed, scoreBlack) {
+  logDebug(`updateScoreboard(${result}, ${scoreRed}, ${scoreBlack})`);
+  document.getElementById("score-red").value = scoreRed;
+  document.getElementById("score-black").value = scoreBlack;
+  document.getElementById("result").innerText = result;
+}
+
+function logDebug(debugText) {
+    let debugElement = document.createElement("p");
+    debugElement.innerText = debugText;
+    document.getElementById("debug-log").prepend(debugElement);
+}
