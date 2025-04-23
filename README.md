@@ -1,6 +1,8 @@
-CodingNomads JavaScript 101 Capstone Project
+# CodingNomads JavaScript 101 Capstone Project
 
-Connect 4
+Play at https://ageinghippy.github.io/connect-four/
+
+# Connect 4
 
 - When the page loads, the competition is already initialised.
 - Clicking on the ~drop~ buttons above the board will drop a game piece into the related column
