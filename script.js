@@ -144,8 +144,35 @@ function toggleTurn() {
   });
 }
 
-function playTurn(x) {
-  
+function playTurn(target,x) {
+  logDebug("playTurn");
+  try {
+    //todo - extract into playTurn method
+    let y = G_boardStorage.dropPiece(x, G_turn);
+    // let board = document.getElementById("board");
+    let square = document.getElementById(`square-${x}-${y}`);
+    square.classList.add(
+      G_turn == Piece.Red ? "game-piece-red" : "game-piece-black"
+    );
+
+    if (y == G_rows - 1) {
+      target.disabled = true;
+      // event.target.innerText = "full";
+    }
+
+    let winningArray = getWinnerArray(G_boardStorage, x, y);
+    if (winningArray) {
+      drawWinner(winningArray);
+      lockdownDrop();
+      G_turn == Piece.Red ? G_scoreRed++ : G_scoreBlack++;
+      updateScoreboard(`${G_turn} wins!!!`, G_scoreRed, G_scoreBlack);
+    } else {
+      toggleTurn();
+    }
+  } catch (error) {
+    console.log(error.message);
+    target.disabled = true;
+  }
 }
 
 function resetDrop() {
