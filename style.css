@@ -27,8 +27,19 @@ div.float-right {
 }
 
 .drop-button {
-    /* display: grid;
-    place-items: center; */
+    font-weight: lighter;
+}
+
+.drop-piece-red:hover:enabled {
+    color:red;
+    font-weight: bold;
+    font-size:2em;
+}
+
+.drop-piece-black:hover:enabled {
+    color:black;
+    font-weight: bold;
+    font-size:2em;
 }
 
 #board {
@@ -38,6 +49,7 @@ div.float-right {
     grid-template-rows: repeat(6,100px);
     grid-template-columns: repeat(7,100px);
     align-content: center;
+    background-color: blue;
 }
 
 .board-square {
@@ -48,18 +60,23 @@ div.float-right {
     text-align: center;
     padding :5%;
     font-size: 4rem;
+
+    height: 70%;
+    width: 70%;
+    border-radius: 50%;
 }
 
 .game-piece-red {
-    color: red;
+    background-color: red;
 }
 
 .game-piece-black {
-    color: black;
+    background-color: black;
 }
 
-.winner {
-    background-color: darkorange;
+.winner::before {
+    content: "W";
+    color: gold;
 }
 
 .game-button {

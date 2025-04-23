@@ -39,7 +39,7 @@
           >Black :
           <input id="score-black" type="number" value="0" disabled />
         </label>
-        <br>
+        <br />
         <div id="debug-log" class="fixed-scrollable"></div>
       </div>
     </div>
@@ -77,7 +77,7 @@
           let dropButton = document.createElement("button");
           dropButton.id = `drop-button-${y}`;
           dropButton.classList.add("drop-button");
-          dropButton.innerText = "drop here";
+          dropButton.innerText = "drop";
           div.appendChild(dropButton);
           dropZone.appendChild(div);
         }
@@ -109,11 +109,10 @@
               square.classList.add(
                 G_turn == Piece.Red ? "game-piece-red" : "game-piece-black"
               );
-              square.innerText = "O";
 
               if (y == G_rows - 1) {
                 event.target.disabled = true;
-                event.target.innerText = "full";
+                // event.target.innerText = "full";
               }
 
               let winningArray = getWinnerArray(G_boardStorage, x, y);

@@ -139,9 +139,13 @@ function toggleTurn() {
   //change drop indicators
   let dropButtons = document.querySelectorAll(".drop-button");
   dropButtons.forEach((btn) => {
-    btn.classList.remove(`game-piece-${oldTurn}`);
-    btn.classList.add(`game-piece-${newTurn}`);
+    btn.classList.remove(`drop-piece-${oldTurn}`);
+    btn.classList.add(`drop-piece-${newTurn}`);
   });
+}
+
+function playTurn(x) {
+  
 }
 
 function resetDrop() {
@@ -149,7 +153,7 @@ function resetDrop() {
   let dropButtons = document.querySelectorAll(".drop-button");
   dropButtons.forEach((btn) => {
     btn.disabled = false;
-    btn.innerText = "drop here";
+    btn.innerText = "drop";
   });
 }
 
@@ -169,7 +173,7 @@ function resetBoard() {
     square.classList.remove("winner");
     square.classList.remove("game-piece-red");
     square.classList.remove("game-piece-black");
-    square.innerText = "";
+    // square.innerText = "";
   });
   resetDrop();
   toggleTurn();
