@@ -81,4 +81,5 @@ div.float-right {
     min-height: 200px;
     max-height: 300px;
     overflow-y: auto;
+    margin-top: 100px;
 }
